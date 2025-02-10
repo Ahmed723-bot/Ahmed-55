@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            transition: background-color 0.5s ease;
+        }
+
+        .calculator {
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            max-width: 90%;
+            transition: background-color 0.5s ease;
+            text-align: center; /* توسيط العناصر داخل الآلة الحاسبة */
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .developer-info {
+            font-size: 1.2em;
+            color: #777;
+            margin-bottom: 20px; /* مساحة أسفل معلومات المطور */
+        }
+
+        input[type="text"] {
+            width: 90%; /* تعديل عرض حقل الإدخال */
+            margin: 10px auto; /* هامش علوي وسفلي، وتوسيط أفقي */
+            padding: 15px;
+            font-size: 1.5em;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: right;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+            display: block; /* لجعل الحقل يملأ العرض المتاح */
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            background-color: #eee;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #ddd;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .function-button {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="developer-info" id="developer-text"></div>
+        <h1>آلة حاسبة علمية</h1>
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="deleteLast()">DEL</button>
+            <button onclick="appendOperator('%')">%</button>
+            <button onclick="appendOperator('/')">/</button>
+
+            <button onclick="appendNumber(7)">7</button>
+            <button onclick="appendNumber(8)">8</button>
+            <button onclick="appendNumber(9)">9</button>
+            <button onclick="appendOperator('*')">*</button>
+
+            <button onclick="appendNumber(4)">4</button>
+            <button onclick="appendNumber(5)">5</button>
+            <button onclick="appendNumber(6)">6</button>
+            <button onclick="appendOperator('-')">-</button>
+
+            <button onclick="appendNumber(1)">1</button>
+            <button onclick="appendNumber(2)">2</button>
+            <button onclick="appendNumber(3)">3</button>
+            <button onclick="appendOperator('+')">+</button>
+
+            <button onclick="appendNumber(0)">0</button>
+            <button onclick="appendDecimal('.')">.</button>
+            <button onclick="calculate()">=</button>
+            <button onclick="appendOperator('^')">^</button>
+            <button onclick="appendOperator('(')">(</button>
+            <button onclick="appendOperator(')')">)</button>
+
+            <button onclick="calculateTrigonometry('sin')">sin</button>
+            <button onclick="calculateTrigonometry('cos')">cos</button>
+            <button onclick="calculateTrigonometry('tan')">tan</button>
+        </div>
+    </div>
+
+    <script>
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function displayDeveloperText() {
+            const developerTextContainer = document.getElementById('developer-text');
+            const text = "Developed By Ahmed @A4A_MOD";
+            let coloredText = "";
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const color = getRandomColor();
+                coloredText += `<span style="color: ${color};">${char}</span>`;
+            }
+            developerTextContainer.innerHTML = coloredText;
+        }
+
+        displayDeveloperText(); // Call it once to display initially
+        setInterval(displayDeveloperText, 1500); // And then every 1.5 seconds
+
+        function appendNumber(number) {
+            document.getElementById('display').value += number;
+        }
+
+        function appendDecimal(decimal) {
+            if (!document.getElementById('display').value.includes('.')) {
+                document.getElementById('display').value += decimal;
+            }
+        }
+
+        function appendOperator(operator) {
+            document.getElementById('display').value += operator;
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        function deleteLast() {
+            let currentValue = document.getElementById('display').value;
+            document.getElementById('display').value = currentValue.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                let expression = document.getElementById('display').value;
+                expression = expression.replace(/\^/g, '**');
+
+                expression = expression.replace(/sin\(/g, 'Math.sin(');
+                expression = expression.replace(/cos\(/g, 'Math.cos(');
+                expression = expression.replace(/tan\(/g, 'Math.tan(');
+
+                let result = eval(expression);
+                document.getElementById('display').value = result;
+            } catch (error) {
+                document.getElementById('display').value = 'Error';
+            }
+        }
+
+        function calculateTrigonometry(func) {
+            try {
+                let currentValue = document.getElementById('display').value;
+                let result = 0;
+                if (currentValue !== "") {
+                    let number = parseFloat(currentValue);
+                    switch (func) {
+                        case 'sin':
+                            result = Math.sin(number * Math.PI / 180);
+                            break;
+                        case 'cos':
+                            result = Math.cos(number * Math.PI / 180);
+                            break;
+                        case 'tan':
+                            result = Math.tan(number * Math.PI / 180);
+                            break;
+                    }
+                    document.getElementById('display').value = result;
+                } else {
+                    document.getElementById('display').value = func + "(";
+                }
+
+            } catch (error) {
+                document.getElementById('display').value = 'Error';
+            }
+        }
+    </script>
+
+</body>
+</html>
